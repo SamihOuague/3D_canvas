@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "webpack": "^5.82.1",
+    "webpack-cli": "^5.1.1"
+  },
+  "name": "phaser_game",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "webpack",
+    "start": "webpack --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
