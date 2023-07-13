@@ -3,14 +3,27 @@
     <head>
         <meta charset="utf-8"/>
         <link rel="stylesheet" href="./src/css/style.css"/>
-        <title>Colony</title>
+        <title>2D Graphics</title>
     </head>
     <body>
-        <h2>Hello World</h2>
+        <h2>Perceptron</h2>
         <div class="container">
-            <canvas id="game" width="200" height="200"></canvas>            
+            <canvas id="game" width="400" height="400"></canvas>            
         </div>
-        
+        <form id="add-point" class="form">
+            <div>
+                <label for="w1">weight 1</label>
+                <input type="range" name="w1" class="range" max="2" min="-2" step="0.1"/>
+            </div>
+            <div>
+                <label for="w2">weight 2</label>
+                <input type="range" name="w2" class="range" max="2" min="-2" step="0.1"/>
+            </div>
+            <div>
+                <label for="b">Bias</label>
+                <input type="range" name="b" class="range" max="10" min="-10"/>
+            </div>
+        </form>
         <script src="./dist/main.js"></script>
     </body>
 </html>

@@ -10,23 +10,33 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./src/index.js":
-/*!**********************!*\
-  !*** ./src/index.js ***!
-  \**********************/
+/***/ "./src/js/index.js":
+/*!*************************!*\
+  !*** ./src/js/index.js ***!
+  \*************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _js_Graphics_3D__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./js/Graphics_3D */ \"./src/js/Graphics_3D.js\");\n\n\n\nlet points = [[-2, 2, 2], [2, 2, 2], [2, -2, 2], [-2, -2, 2],\n            [-2, 2, -2], [2, 2, -2], [2, -2, -2], [-2, -2, -2], \n            [2, 2, 0], [-2, 2, 0], [0, 2, 2], [0, 2, -2], [0, 2, 0],\n            [-2, -2, 0], [0, -2, 2], [0, -2, -2], [2, -2, 0], [0, -2, 0],\n            [2, 0, 2], [2, 0, -2], [-2, 0, -2], [-2, 0, 2],\n            [2, 0, 0], [-2, 0, 0], [0, 0, 2], [0, 0, -2]];\nlet g = new _js_Graphics_3D__WEBPACK_IMPORTED_MODULE_0__[\"default\"](200, 200, points);\n\ng.init_graphic();\n\nlet rx, ry, rz;\nrx = ry = rz = 0;\n\nlet myInt = setInterval(() => {\n    rx = ry = rx + 1;\n    g.rotation_3D(rx, ry, rz);\n\n}, 100);\n\n//# sourceURL=webpack://phaser_game/./src/index.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _lib2d_Scene__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib2d/Scene */ \"./src/js/lib2d/Scene.js\");\n\n\nlet canvas = document.getElementById(\"game\");\nlet ctx = canvas.getContext(\"2d\");\n\n\nlet scene = new _lib2d_Scene__WEBPACK_IMPORTED_MODULE_0__[\"default\"](400, 400, ctx, 10);\n\n\nclass Vector {\n    constructor(x, y, w = 1) {\n        this.x = x;\n        this.y = y;\n        this.w = w;\n    }\n}\n\nclass Neurone {\n    constructor(b, w1, w2) {\n        this.w1 = w1;\n        this.w2 = w2;\n        this.bias = b;\n    }\n\n    get_z(x1, x2) {\n        return (this.w1 * x1) + (this.w2 * x2) + this.bias;\n    }\n}\n\nlet n = new Neurone(0, 1, 0.5);\n\nlet sy = -(n.w1/n.w2);\n\nlet y = -(n.bias/n.w2);\n\nscene.draw_line({x: 10, y: (sy * 10) + y}, {x: -10, y: (sy * -10) + y}, \"#ffffff\");\n\nlet elt = document.getElementsByClassName(\"range\");\nlet points = [new Vector(2, 3), new Vector(4, -3), new Vector(1, -1), new Vector(-4, 1)];\n\nlet d_points = () => {\n    for (const p in points) {\n        const { x, y } = points[p]\n        scene.add_point(points[p], (n.get_z(x, y) >= 0) ? \"#ffffff\" : \"#ff0000\");\n    }\n}\n\nd_points();\n\nscene.add_point({x: 2, y: 3}, \"#ffffff\");\n\nfor (let i = 0; i < elt.length; i++) {\n    elt[i].addEventListener(\"change\", (e) => {\n        switch(e.target.name) {\n            case \"w1\":\n                n.w1 = Number(e.target.value);\n                break;\n            case \"w2\":\n                n.w2 = Number(e.target.value);\n                break;\n            case \"b\":\n                n.bias = Number(e.target.value);\n                break;\n        }\n        sy = (-n.w1/n.w2);\n        y = -(n.bias/n.w2);\n\n        scene.reset();\n        d_points();\n        scene.draw_line({x: 10, y: (sy * 10) + y}, {x: -10, y: (sy * -10) + y}, \"#ffffff\");\n    });\n}\n\n//# sourceURL=webpack://phaser_game/./src/js/index.js?");
 
 /***/ }),
 
-/***/ "./src/js/Graphics_3D.js":
+/***/ "./src/js/lib2d/Scene.js":
 /*!*******************************!*\
-  !*** ./src/js/Graphics_3D.js ***!
+  !*** ./src/js/lib2d/Scene.js ***!
   \*******************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nclass Graphics_3D {\n    constructor(w, h, v) {\n        let canvas = document.getElementById(\"game\");\n        this.ctx = canvas.getContext(\"2d\");\n        this.width = w;\n        this.height = h;\n        this.initial_vertices = [...v];\n        this.vertices = v;\n        this.vectors = [];\n    }\n\n    init_graphic = () => {\n        for (let i in this.vertices) {\n            let v = this.vertices[i];\n            this.draw_point(v[0], v[1]);\n        }\n    }\n\n    draw_point = (x, y) => {\n        let pos_x = (x * 20) + 100;\n        let pos_y = 100 - (y * 20);\n        this.ctx.beginPath();\n        this.ctx.fillStyle = \"#afafaf\";\n        this.ctx.fillRect(pos_x - 2, pos_y - 2, 4, 4);\n        this.ctx.closePath();\n    }\n\n    draw_line = (from, to) => {\n        let [start_x, start_y] = from;\n        let [end_x, end_y] = to;\n        let x = [(start_x * 20) + 100, (end_x * 20) + 100];\n        let y = [100 - (start_y * 20), 100 - (end_y * 20)]\n        this.ctx.beginPath();\n        this.ctx.strokeStyle = \"#ffffff\";\n        this.ctx.moveTo(x[0], y[0]);\n        this.ctx.lineTo(x[1], y[1]);\n        this.ctx.stroke();\n        this.ctx.closePath();\n    }\n\n    reset_graph = () => {\n        this.ctx.clearRect(0, 0, this.width, this.height);\n    }\n\n    get_radians = (deg) => {\n        return deg * (Math.PI/180);\n    }\n\n    rotation_3D = (alpha, beta, gamma) => {\n        let tetha_x = this.get_radians(alpha);\n        let tetha_y = this.get_radians(beta);\n        let tetha_z = this.get_radians(gamma);\n\n        let [cos_x, sin_x] = [Math.cos(tetha_x), Math.sin(tetha_x)];\n        let [cos_y, sin_y] = [Math.cos(tetha_y), Math.sin(tetha_y)];\n        let [cos_z, sin_z] = [Math.cos(tetha_z), Math.sin(tetha_z)];\n        this.vertices = [...this.initial_vertices];\n        for (let i in this.vertices) {\n            let [x, y, z] = this.vertices[i];\n            this.vertices[i] = [x, (y * cos_x) - (z * sin_x), (y * sin_x) + (z * cos_x)];\n\n            [x, y, z] = this.vertices[i];\n            this.vertices[i] = [(x * cos_y) + (z * sin_y), y, (z * cos_y) - (x * sin_y)];\n\n            [x, y, z] = this.vertices[i];\n            this.vertices[i] = [(x * cos_z) - (y * sin_z), (x * sin_z) + (y * cos_z), z];\n        }\n\n        this.reset_graph();\n        this.init_graphic();\n    }\n}\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Graphics_3D);\n\n//# sourceURL=webpack://phaser_game/./src/js/Graphics_3D.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _Vector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Vector */ \"./src/js/lib2d/Vector.js\");\n\n\nclass Scene {\n    constructor(w, h, ctx, o = 10) {\n        this.width = w;\n        this.height = h;\n        this.ctx = ctx;\n        this.origin = o;\n        this.init_scene();\n    }\n\n    init_scene = () => {\n        for (let i = 1; i < 20; i++) {\n            if (i != this.origin)\n                this.draw_line([i * 20, 0], [i * 20, this.height], \"#1f1f1f\", true);\n            if (i != 20 - this.origin)\n                this.draw_line([0, i * 20], [this.width, i * 20], \"#1f1f1f\", true);\n        }\n        this.draw_line([this.origin * 20, 0], [this.origin * 20, this.height], \"#ff0000\", true);\n        this.draw_line([0, this.height - this.origin * 20], [this.width, this.height - this.origin * 20], \"#ff0000\", true);\n    }\n\n    draw_line = (from, to, color = \"#1f1f1f\", noctx = false) => {\n        let [from_x, from_y] = this.transform_xy(from);\n        let [to_x, to_y] = this.transform_xy(to);\n        if (noctx) {\n            [from_x, from_y] = from;\n            [to_x, to_y] = to;\n        }\n\n        this.ctx.beginPath();\n\n        this.ctx.strokeStyle = color;\n        this.ctx.moveTo(from_x, from_y);\n        this.ctx.lineTo(to_x, to_y);\n        this.ctx.stroke();\n\n        this.ctx.closePath();\n    }\n\n    reset = () => {\n        this.ctx.clearRect(0, 0, this.width, this.height);\n        this.init_scene();\n    }\n\n    transform_xy = (vector) => {\n        let x = 20 * (vector.x + this.origin);\n        let y = this.height - (20 * (vector.y + this.origin));\n\n        return [x, y];\n    }\n\n    add_point = (vector, color = \"#ffffff\") => {\n        const [x, y] = this.transform_xy(vector);\n        this.ctx.beginPath();\n        this.ctx.fillStyle = color;\n        this.ctx.fillRect(x - 2, y - 2, 4, 4);\n        this.ctx.closePath();\n    }\n}\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Scene);\n\n//# sourceURL=webpack://phaser_game/./src/js/lib2d/Scene.js?");
+
+/***/ }),
+
+/***/ "./src/js/lib2d/Vector.js":
+/*!********************************!*\
+  !*** ./src/js/lib2d/Vector.js ***!
+  \********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nclass Vector {\n    constructor(x, y) {\n        this.x = x;\n        this.y = y;\n        this.next = null;\n    }\n}\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Vector);\n\n//# sourceURL=webpack://phaser_game/./src/js/lib2d/Vector.js?");
 
 /***/ })
 
@@ -90,7 +100,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module can't be inlined because the eval devtool is used.
-/******/ 	var __webpack_exports__ = __webpack_require__("./src/index.js");
+/******/ 	var __webpack_exports__ = __webpack_require__("./src/js/index.js");
 /******/ 	
 /******/ })()
 ;
