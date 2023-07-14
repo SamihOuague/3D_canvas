@@ -12,6 +12,9 @@
         </div>
         <form id="add-point" class="form">
             <div>
+                <button id="learn">Learn</button>
+            </div>
+            <div>
                 <label for="w1">weight 1</label>
                 <input type="range" name="w1" class="range" max="2" min="-2" step="0.1"/>
             </div>
@@ -21,9 +24,12 @@
             </div>
             <div>
                 <label for="b">Bias</label>
-                <input type="range" name="b" class="range" max="10" min="-10"/>
+                <input type="range" name="b" class="range" max="2" min="-2"/>
             </div>
         </form>
+        <div class="container">
+            <canvas id="tanh" width="400" height="400"></canvas>            
+        </div>
         <script src="./dist/main.js"></script>
     </body>
 </html>

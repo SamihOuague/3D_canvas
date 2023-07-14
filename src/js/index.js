@@ -1,33 +1,21 @@
 import Scene from "./lib2d/Scene";
+import Vector from "./lib2d/Vector";
+import Neurone from "./lib2d/Neurone";
+
 
 let canvas = document.getElementById("game");
 let ctx = canvas.getContext("2d");
 
-
 let scene = new Scene(400, 400, ctx, 10);
 
 
-class Vector {
-    constructor(x, y, w = 1) {
-        this.x = x;
-        this.y = y;
-        this.w = w;
-    }
-}
+let canvas2 = document.getElementById("tanh");
+let ctx2 = canvas2.getContext("2d");
 
-class Neurone {
-    constructor(b, w1, w2) {
-        this.w1 = w1;
-        this.w2 = w2;
-        this.bias = b;
-    }
+let actfun = new Scene(400, 400, ctx2, 10);
 
-    get_z(x1, x2) {
-        return (this.w1 * x1) + (this.w2 * x2) + this.bias;
-    }
-}
 
-let n = new Neurone(0, 1, 0.5);
+let n = new Neurone(Math.random() * 2, Math.random() * 2, Math.random() * 2);
 
 let sy = -(n.w1/n.w2);
 
@@ -36,37 +24,101 @@ let y = -(n.bias/n.w2);
 scene.draw_line({x: 10, y: (sy * 10) + y}, {x: -10, y: (sy * -10) + y}, "#ffffff");
 
 let elt = document.getElementsByClassName("range");
-let points = [new Vector(2, 3), new Vector(4, -3), new Vector(1, -1), new Vector(-4, 1)];
+let points = [];
+const e = 2.71828;
 
 let d_points = () => {
     for (const p in points) {
-        const { x, y } = points[p]
-        scene.add_point(points[p], (n.get_z(x, y) >= 0) ? "#ffffff" : "#ff0000");
+        const { x, y } = points[p];
+        actfun.add_point({x, y});
+    }
+}
+
+
+let y0_points = [];
+let y1_points = [];
+
+for (let i = -10; i < 10; i += 0.5) {
+    points.push(new Vector(i, Math.tanh(i)));
+}
+
+if (Math.round(Math.random() * 10) % 2 != 0) {
+    for (let i = 0; i < 20; i++) {
+
+        let x = Math.floor(Math.random() * 20) - 10;
+        let y = Math.floor(Math.random() * 8) - 10;
+        y0_points.push(new Vector(x, y));
+
+        x = Math.floor(Math.random() * 20) - 10;
+        y = Math.floor(Math.random() * 13) - 10;
+        y1_points.push(new Vector(x, -y));
+    }
+} else {
+    for (let i = 0; i < 15; i++) {
+        let x = Math.floor(Math.random() * 10) - 10;
+        let y = Math.floor(Math.random() * 20) - 10;
+        y0_points.push(new Vector(x, y));
+
+        x = Math.floor(Math.random() * 10) - 10;
+        y = Math.floor(Math.random() * 20) - 10;
+        y1_points.push(new Vector(-x, y));
+    }
+}
+let e_points = () => {
+    for (let i = 0; i < y0_points.length; i++) {
+        
+        scene.add_point(y0_points[i], "#ff0000");
+        scene.add_point(y1_points[i], "#00ff00");
     }
 }
 
 d_points();
+e_points();
 
-scene.add_point({x: 2, y: 3}, "#ffffff");
 
-for (let i = 0; i < elt.length; i++) {
-    elt[i].addEventListener("change", (e) => {
-        switch(e.target.name) {
+
+document.getElementById("add-point").addEventListener("submit", (e) => {
+    e.preventDefault();
+    let r = 0.1;
+    
+    for (let i = 0; i < y1_points.length; i++) {
+        let { x, y } = y1_points[i];
+        if (n.get_z(x, y) < 0) {
+            n.w1 = n.w1 + (r * 1 * x);
+            n.w2 = n.w2 + (r * 1 * y);
+            n.bias = n.bias + (r * 1 * 1);
+        }
+    }
+    
+
+    for (let i = 0; i < y0_points.length; i++) {
+        const { x, y } = y0_points[i];
+        if (n.get_z(x, y) > 0) {
+            n.w1 = n.w1 + (r * -1 * x);
+            n.w2 = n.w2 + (r * -1 * y);
+            n.bias = n.bias + (r * -1 * 1);
+        }
+    }
+
+    
+    sy = -(n.w1/n.w2);
+    y = -(n.bias/n.w2);
+
+    scene.reset();
+    d_points();
+    e_points();
+    scene.draw_line({x: 10, y: (sy * 10) + y}, {x: -10, y: (sy * -10) + y}, "#ffffff");
+    for (let i = 0; i < elt.length; i++) {
+        switch(elt[i].name) {
             case "w1":
-                n.w1 = Number(e.target.value);
+                elt[i].value = n.w1;
                 break;
             case "w2":
-                n.w2 = Number(e.target.value);
+                elt[i].value = n.w2;
                 break;
             case "b":
-                n.bias = Number(e.target.value);
+                elt[i].value = n.bias;
                 break;
         }
-        sy = (-n.w1/n.w2);
-        y = -(n.bias/n.w2);
-
-        scene.reset();
-        d_points();
-        scene.draw_line({x: 10, y: (sy * 10) + y}, {x: -10, y: (sy * -10) + y}, "#ffffff");
-    });
-}
+    }
+});
